@@ -1,0 +1,30 @@
+syntax = "proto3";
+
+option csharp_namespace = "Cinema.gRPC.Api";
+
+package ticket;
+import "google/protobuf/empty.proto";
+
+service TicketsApi {
+    
+    rpc CreateReservation(CreateReservationRequest) returns (CreateReservationResponse);
+    rpc PurchaseTicket(PurchaseTicketRequest) returns (google.protobuf.Empty);
+}
+
+message CreateReservationRequest {
+    int32 showtime_id = 1;
+    int32 row = 2;
+    repeated int32 seats = 3;
+}
+
+message CreateReservationResponse {
+    string id = 1;               
+    int32 auditorium_id = 2;
+    int32 seats_count = 3;
+    string movie_title = 4;
+}
+
+message PurchaseTicketRequest {
+    string reservation_id = 1;
+}
+
