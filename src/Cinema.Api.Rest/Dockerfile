@@ -5,14 +5,23 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-COPY ["src/Cinema.Api.Rest/Cinema.Api.Rest.csproj", "src/Cinema.Api.Rest/"]
-COPY ["src/Cinema.Application/Cinema.Application.csproj", "src/Cinema.Application/"]
-COPY ["src/Cinema.Domain/Cinema.Domain.csproj", "src/Cinema.Domain/"]
-COPY ["src/Cinema.Contracts/Cinema.Contracts.csproj", "src/Cinema.Contracts/"]
-COPY ["src/Cinema.Infrastructure/Cinema.Infrastructure.csproj", "src/Cinema.Infrastructure/"]
-RUN dotnet restore "src/Cinema.Api.Rest/Cinema.Api.Rest.csproj"
+
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY ../Cinema.Api.Rest/Cinema.Api.Rest.csproj  Cinema.Api.Rest/
+COPY ../Cinema.Application/Cinema.Application.csproj Cinema.Application/
+COPY ../Cinema.Domain/Cinema.Domain.csproj Cinema.Domain/
+COPY ../Cinema.Contracts/Cinema.Contracts.csproj Cinema.Contracts/
+COPY ../Cinema.Infrastructure/Cinema.Infrastructure.csproj Cinema.Infrastructure/
+
+RUN dotnet restore "Cinema.Api.Rest/Cinema.Api.Rest.csproj"
+
 COPY . .
-WORKDIR "/src/src/Cinema.Api.Rest"
+
+WORKDIR "/src/Cinema.Api.Rest"
 RUN dotnet build "Cinema.Api.Rest.csproj" -c Release -o /app/build
 
 FROM build AS publish
